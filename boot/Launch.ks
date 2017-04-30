@@ -1,6 +1,8 @@
 Copypath("0:/circularize","1:").
 Run once "circularize".
 
+Runpath("0:/preferences").
+
 Print "Launching in 5 seconds.".
 Wait 5.
 Print "Launch!".

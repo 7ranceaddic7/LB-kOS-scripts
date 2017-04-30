@@ -2,6 +2,8 @@
 // https://www.reddit.com/r/Kos/comments/45axu6/boostback_burn_help/czxoi2f/?st=j245tcd7&sh=86ba30e1
 //Hoverslam adapted from https://github.com/mrbradleyjh/kOS-Hoverslam
 
+Runpath("0:/preferences").
+
 Print "Setting up.".
 Set launchLongitude to geoposition:lng.
 Set radarOffset to alt:radar.
@@ -62,7 +64,7 @@ Until not boostingBack {
   Print "   Est. impact distance from launch: " + round(currentImpactDistance,3) + "km".
   If currentImpactDistance < 50 and not emergencyAbort {
     Lock throttle to max(currentImpactDistance / 50, 0.05).
-    Print "Setting throttle to " + round(throttle * 100,0) + "%".
+    Print "   Setting throttle to " + round(throttle * 100,0) + "%".
   }.
   If currentImpactDistance < 1 {
     Print "Est. impact distance from launch < 1km!".
@@ -92,11 +94,15 @@ Unlock steering.
 Set ship:control:pilotmainthrottle to 0.
 Unlock throttle.
 Print "Est. dv available for landing: " + round(landingDV(boosterEngine,reserveTanks),2).
-Print "Attempting to transfer propellant to booster, if applicable.".
 For eachTank in reserveTanks {
   For eachResource in eachTank:resources {
-    Set transferAttempt to transferall(eachResource:name,eachTank,boosterEngine).
-    Print "   Status: " transferAttempt:status + "; Goal: " + transferAttempt:goal + " " + transferAttempt:resource.
+    For boosterResource in boosterEngine:resources {
+      If boosterResource:name = eachResource:name {
+        Set transferAttempt to transferall(eachResource:name,eachTank,boosterEngine).
+        Set transferAttempt:active to true.
+        Print "Transferring propellant to booster: " + transferAttempt:resource.
+      }.
+    }.
   }.
 }.
 Print "Waiting to land...".
@@ -105,19 +111,17 @@ Print "Deploying brakes.".
 Brakes on.
 Print "Steering to retrograde.".
 Lock steering to R(srfretrograde:pitch,srfretrograde:yaw,facing:roll).
-Wait until altitude < 10000.
+Wait until altitude < 5000.
 Print "Enabling RCS.".
 RCS on.
-Wait until altitude < 5000.
-Print "Deploying landing gear.".
-Gear on.
 Print "Calculating landing.".
 Lock maxAcceleration to ship:availablethrust / ship:mass - 9.81.
 Lock stoppingDistance to verticalspeed ^ 2 / (2 * maxAcceleration).
 Lock idealThrottle to stoppingDistance / (alt:radar - radarOffset).
 Wait until alt:radar - radarOffset < stoppingDistance.
-Print "Beginning hoverslam.".
+Print "Performing hoverslam.".
 Lock throttle to idealThrottle.
+Gear on.
 Wait until verticalspeed > -5.
 Print "Touching down.".
 Lock throttle to 5 / maxAcceleration.

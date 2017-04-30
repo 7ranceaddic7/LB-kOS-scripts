@@ -2,11 +2,11 @@
 
 Function averageIsp {
   Parameter engineList.
-  Local totalThrust = 0.
-  Local totalFuelFlow = 0.
+  Local totalThrust is 0.
+  Local totalFuelFlow is 0.
   For eng in engineList {
-    totalThrust = totalThrust + eng:maxthrust.
-    totalFuelFlow = totalFuelFlow + (eng:maxthrust / eng:isp).
+    Set totalThrust to totalThrust + eng:maxthrust.
+    Set totalFuelFlow to totalFuelFlow + (eng:maxthrust / eng:isp).
   }.
   Return totalThrust / totalFuelFlow.
 }.
