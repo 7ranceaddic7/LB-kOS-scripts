@@ -5,6 +5,7 @@ Runpath("0:/preferences").
 
 Print "Launching in 5 seconds.".
 Wait 5.
+Lock steering to heading(90,0) + R(0,0,270).
 Print "Launch!".
 Stage.
 Wait 1.

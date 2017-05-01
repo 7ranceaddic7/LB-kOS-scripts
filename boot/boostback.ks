@@ -16,16 +16,28 @@ Print "Staging.".
 Stage.
 Wait 0.1.
 Set reserveTanks to ship:partstagged("reservefuel").
+reserveTanks:add(boosterEngine).
 Print "Zeroing throttle.".
 Lock throttle to 0.
-Print "Waiting 5s for separation.".
-Wait 5.
 Print "Enabling reserve propellants.".
 For eachTank in reserveTanks {
   For eachResource in eachTank:resources {
     Set eachResource:enabled to true.
   }.
 }.
+For eachTank in reserveTanks {
+  For eachResource in eachTank:resources {
+    For boosterResource in boosterEngine:resources {
+      If boosterResource:name = eachResource:name {
+        Set transferAttempt to transferall(eachResource:name,eachTank,boosterEngine).
+        Set transferAttempt:active to true.
+        Print "Transferring propellant to booster: " + transferAttempt:resource.
+      }.
+    }.
+  }.
+}.
+Print "Waiting 5s for separation.".
+Wait 5.
 Print "Enabling RCS.".
 RCS on.
 Print "Steering west.".
@@ -94,17 +106,6 @@ Unlock steering.
 Set ship:control:pilotmainthrottle to 0.
 Unlock throttle.
 Print "Est. dv available for landing: " + round(landingDV(boosterEngine,reserveTanks),2).
-For eachTank in reserveTanks {
-  For eachResource in eachTank:resources {
-    For boosterResource in boosterEngine:resources {
-      If boosterResource:name = eachResource:name {
-        Set transferAttempt to transferall(eachResource:name,eachTank,boosterEngine).
-        Set transferAttempt:active to true.
-        Print "Transferring propellant to booster: " + transferAttempt:resource.
-      }.
-    }.
-  }.
-}.
 Print "Waiting to land...".
 Wait until altitude < 15000.
 Print "Deploying brakes.".
@@ -146,7 +147,7 @@ Function impactLongitude {
     Set someAltitude to someVector:mag - body:radius.
   }.
   return body:geopositionof(somePosition):lng - ((someTime:seconds - time:seconds)/60).
-  //Alternate method: calculate from true anomaly at time of impact.
+  //Alternate method: calculate from true anomaly.
 }.
 
 Function impactDistance {

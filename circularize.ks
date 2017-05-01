@@ -3,15 +3,15 @@
 Copypath("0:/burnTime","1:").
 Run once "burnTime".
 
-Function circularize { //deal with lazyglobal scope eventually.
+Function circularize { 
   Print "Calculating circularization burn.".
-  Set targetSpeed to sqrt(body:mu / (body:radius + apoapsis)).
-  Set suborbitalApoapsisSpeed to velocityat(ship, time:seconds + eta:apoapsis):orbit:mag.
-  Set circularizationDV to targetspeed - suborbitalApoapsisSpeed.
+  Local targetSpeed to sqrt(body:mu / (body:radius + apoapsis)).
+  Local suborbitalApoapsisSpeed to velocityat(ship, time:seconds + eta:apoapsis):orbit:mag.
+  Local circularizationDV to targetspeed - suborbitalApoapsisSpeed.
   Print "   Circularization dv: " + round(circularizationDV,2).
-  Set burnLength to burnTime(circularizationDV).
+  Local burnLength to burnTime(circularizationDV).
   Print "   Burn duration: " + round(burnLength,2) + "s".
-  Set circularizationNode to node(time:seconds + eta:apoapsis,0,0,circularizationDV).
+  Local circularizationNode to node(time:seconds + eta:apoapsis,0,0,circularizationDV).
   Add circularizationNode.
   Print "Node added.".
   Lock steering to r(circularizationNode:burnvector:direction:pitch,circularizationNode:burnvector:direction:yaw,facing:roll).

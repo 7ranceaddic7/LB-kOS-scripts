@@ -12,7 +12,6 @@ Function burnTime {
       availableEngines:add(eng).
     }
   }.
-  //Print availableEngines:length + " engines available for burn out of " + allEngines:length + " total.".
   Local availableIsp is averageIsp(availableEngines).
   Return 9.80665 * mass * availableIsp * (1 - constant:e ^ (-nodeDV / (9.80665 * availableIsp))) / ship:availablethrust.
 }.
