@@ -5,7 +5,7 @@ Runpath("0:/preferences").
 
 Print "Launching in 5 seconds.".
 Wait 5.
-Lock steering to heading(90,0) + R(0,0,270).
+Lock steering to heading(90,90) + R(0,0,270).
 Print "Launch!".
 Stage.
 Wait 1.
@@ -32,7 +32,18 @@ Lock throttle to 0.
 Print "Switching to prograde.".
 Lock steering to r(prograde:pitch,prograde:yaw,facing:roll).
 Print "Coasting to circularization...".
-Wait until altitude > 70000.
+Until altitude > 70000 {
+  If throttle = 0 and apoapsis < 72500 {
+    Print "   Raising apoapsis again.".
+    Lock throttle to 1.
+  }.
+  If throttle > 0 and apoapsis > 75000 {
+    Print "   Coasting again.".
+    Lock throttle to 0.
+  }.
+  Wait 0.1.
+}.
+Lock throttle to 0.
 Circularize().
 Print "Launch complete.".
 Set warp to 0.

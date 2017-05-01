@@ -16,7 +16,6 @@ Print "Staging.".
 Stage.
 Wait 0.1.
 Set reserveTanks to ship:partstagged("reservefuel").
-reserveTanks:add(boosterEngine).
 Print "Zeroing throttle.".
 Lock throttle to 0.
 Print "Enabling reserve propellants.".
@@ -36,6 +35,7 @@ For eachTank in reserveTanks {
     }.
   }.
 }.
+reserveTanks:add(boosterEngine).
 Print "Waiting 5s for separation.".
 Wait 5.
 Print "Enabling RCS.".
@@ -83,6 +83,7 @@ Until not boostingBack {
     Lock throttle to 0.
     Set boostingBack to false.
   }.
+  Wait 0.1.
 }.
 If not emergencyAbort {
   Print "Intentionally overshooting.".
@@ -96,6 +97,7 @@ If not emergencyAbort {
       Lock throttle to 0.
       Set overshooting to false.
     }.
+    Wait 0.1.
   }.
 }.
 Set cancelAbort to true.
@@ -125,8 +127,9 @@ Lock throttle to idealThrottle.
 Gear on.
 Wait until verticalspeed > -5.
 Print "Touching down.".
-Lock throttle to 5 / maxAcceleration.
+Lock throttle to 9.81 / (maxAcceleration + 9.81).
 Print "Setting throttle to " + round(throttle * 100,2) + "%".
+Lock steering to R(up:pitch,up:yaw,facing:roll).
 Wait until status = "LANDED" or status = "SPLASHED".
 Set ship:control:pilotmainthrottle to 0.
 Unlock throttle.
@@ -141,7 +144,7 @@ Function impactLongitude {
   Local someVector is somePosition - body:position.
   Local someAltitude is ship:altitude.
   Until someAltitude < 75 {
-    Set someTime to someTime + 1.
+    Set someTime to someTime + 2.
     Set somePosition to positionat(ship, someTime).
     Set someVector to somePosition - body:position.
     Set someAltitude to someVector:mag - body:radius.
