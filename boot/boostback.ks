@@ -1,6 +1,8 @@
 //Impact determination adapted from
 // https://www.reddit.com/r/Kos/comments/45axu6/boostback_burn_help/czxoi2f/?st=j245tcd7&sh=86ba30e1
-//Hoverslam adapted from https://github.com/mrbradleyjh/kOS-Hoverslam
+
+Copypath("0:/hoverslam","1:").
+Run once "hoverslam".
 
 Runpath("0:/preferences").
 
@@ -117,26 +119,7 @@ Lock steering to R(srfretrograde:pitch,srfretrograde:yaw,facing:roll).
 Wait until altitude < 5000.
 Print "Enabling RCS.".
 RCS on.
-Print "Calculating landing.".
-Lock maxAcceleration to ship:availablethrust / ship:mass - 9.81.
-Lock stoppingDistance to verticalspeed ^ 2 / (2 * maxAcceleration).
-Lock idealThrottle to stoppingDistance / (alt:radar - radarOffset).
-Wait until alt:radar - radarOffset < stoppingDistance.
-Print "Performing hoverslam.".
-Lock throttle to idealThrottle.
-Gear on.
-Wait until verticalspeed > -5.
-Print "Touching down.".
-Lock throttle to 9.81 / (maxAcceleration + 9.81).
-Print "Setting throttle to " + round(throttle * 100,2) + "%".
-Lock steering to R(up:pitch,up:yaw,facing:roll).
-Wait until status = "LANDED" or status = "SPLASHED".
-Set ship:control:pilotmainthrottle to 0.
-Unlock throttle.
-Unlock steering.
-Print "Enabling SAS.".
-SAS on.
-Print "Situation: " + status.
+Hoverslam(radarOffset).
 
 Function impactLongitude {
   Local someTime is time.
