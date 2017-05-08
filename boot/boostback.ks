@@ -1,10 +1,11 @@
-//Impact determination adapted from
-// https://www.reddit.com/r/Kos/comments/45axu6/boostback_burn_help/czxoi2f/?st=j245tcd7&sh=86ba30e1
-
-Copypath("0:/hoverslam","1:").
+Copypath("0:/Functions/hoverslam","1:").
 Run once "hoverslam".
+Copypath("0:/Functions/availableEngines","1:").
+Run once "availableEngines".
+Copypath("0:/Functions/averageIsp","1:").
+Run once "averageIsp".
 
-Runpath("0:/preferences").
+Runpath("0:/boot/preferences").
 
 Print "Setting up.".
 Set launchLongitude to geoposition:lng.
@@ -38,6 +39,7 @@ For eachTank in reserveTanks {
   }.
 }.
 reserveTanks:add(boosterEngine).
+Set sepDV to landingDV(reserveTanks).
 Print "Waiting 5s for separation.".
 Wait 5.
 Print "Enabling RCS.".
@@ -54,15 +56,16 @@ Until differenceFromWest < 2 {
   Wait 1.
 }.
 Print "Steering time was " + round(time:seconds - steeringStartTime,2) + "s".
+Set steeredDV to landingDV(reserveTanks).
 Print "Est. impact distance from launch: " + round(impactDistance(),3) + "km".
 Print "Preparing to boost back.".
 Set boostingBack to false.
 Set overshooting to false.
 Set emergencyAbort to false.
 Set cancelAbort to false.
-When landingDV(boosterEngine, reserveTanks) < 350 or cancelAbort then {
+When landingDV( reserveTanks) < 400 or cancelAbort then {
   If boostingBack or overshooting {
-    Print "Aborting site selection: landing capacity < 350 dv".
+    Print "Aborting site selection: landing capacity < 400 dv".
     Lock throttle to 0.
     Set boostingBack to false.
     Set overshooting to false.
@@ -78,7 +81,6 @@ Until not boostingBack {
   Print "   Est. impact distance from launch: " + round(currentImpactDistance,3) + "km".
   If currentImpactDistance < 50 and not emergencyAbort {
     Lock throttle to max(currentImpactDistance / 50, 0.05).
-    Print "   Setting throttle to " + round(throttle * 100,0) + "%".
   }.
   If currentImpactDistance < 1 {
     Print "Est. impact distance from launch < 1km!".
@@ -103,25 +105,47 @@ If not emergencyAbort {
   }.
 }.
 Set cancelAbort to true.
+Set boostedDV to landingDV(reserveTanks).
 Lock throttle to 0.
 Print "Releasing control until landing.".
 RCS off.
 Unlock steering.
 Set ship:control:pilotmainthrottle to 0.
 Unlock throttle.
-Print "Est. dv available for landing: " + round(landingDV(boosterEngine,reserveTanks),2).
 Print "Waiting to land...".
 Wait until altitude < 15000.
 Print "Deploying brakes.".
 Brakes on.
-Print "Steering to retrograde.".
 Lock steering to R(srfretrograde:pitch,srfretrograde:yaw,facing:roll).
 Wait until altitude < 5000.
 Print "Enabling RCS.".
 RCS on.
 Hoverslam(radarOffset).
+Set finalDV to landingDV(reserveTanks).
+Print "Sea-level delta-V: ".
+Print "   Separation: " + round(sepDV,2) + " available".
+Print "   Steering:   " + round(sepDV - steeredDV,2) + " consumed".
+Print "   Boostback:  " + round(steeredDV - boostedDV,2) + " consumed".
+Print "   Landing:    " + round(boostedDV - finalDV,2) + " consumed".
+Print "   Final:      " + round(finalDV,2) + " available".
 
-Function impactLongitude {
+Function landingDV {
+  Parameter availableTanks.
+  Local landingEngines is availableEngines().
+  Local propellantMass to 0. //replace this with AggregateResource
+  For landingTank in availableTanks {
+    For landingResource in landingTank:resources {
+      Set propellantMass to propellantMass + (landingResource:amount * landingResource:density).
+    }.
+  }.
+  return ln(mass / (mass - propellantMass)) * averageIspAt(landingEngines,0) * 9.81.
+}.
+
+//Impact determination adapted from
+// https://www.reddit.com/r/Kos/comments/45axu6/boostback_burn_help/czxoi2f/?st=j245tcd7&sh=86ba30e1
+
+Function impactDistance {
+  //Alternate method: calculate from true anomaly.
   Local someTime is time.
   Local somePosition is positionat(ship, someTime).
   Local someVector is somePosition - body:position.
@@ -132,22 +156,6 @@ Function impactLongitude {
     Set someVector to somePosition - body:position.
     Set someAltitude to someVector:mag - body:radius.
   }.
-  return body:geopositionof(somePosition):lng - ((someTime:seconds - time:seconds)/60).
-  //Alternate method: calculate from true anomaly.
-}.
-
-Function impactDistance {
-  return abs(impactLongitude() - launchLongitude) * (2 * constant:pi * body:radius / 360 / 1000).
-}.
-
-Function landingDV {
-  //Assumes we're landing with only one kind of engine.
-  Parameter landingEngine, availableTanks.
-  Local propellantMass to 0.
-  For landingTank in availableTanks {
-    For landingResource in landingTank:resources {
-      Set propellantMass to propellantMass + (landingResource:amount * landingResource:density).
-    }.
-  }.
-  return ln(mass / (mass - propellantMass)) * landingEngine:sealevelisp * 9.81.
+  Local impactLongitude is body:geopositionof(somePosition):lng - ((someTime:seconds - time:seconds)/60)
+  return abs(impactLongitude - launchLongitude) * (2 * constant:pi * body:radius / 360 / 1000).
 }.

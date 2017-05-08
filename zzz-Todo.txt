@@ -1,0 +1,13 @@
+Short Term:
+
+AverageIsp: replace fuel flow calc with engine:fuelflow
+
+Create reentry script to land at KSC.
+
+
+Wishlist:
+
+Boostback/landingDV: replace propellant mass calc with AggregateResource
+    Is it possible to get a list of propellants from an engine?
+
+Boostback/impactLongitude: Calculate impact longitude from true velocity

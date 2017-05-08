@@ -1,17 +1,12 @@
 //Adapted from https://www.reddit.com/r/Kos/comments/3ftcwk/compute_burn_time_with_calculus/
 
-Copypath("0:/avgIsp","1:").
-Run once "avgIsp".
+Copypath("0:/Functions/averageIsp","1:").
+Run once "averageIsp".
+Copypath("0:/Functions/availableEngines","1:").
+Run once "availableEngines".
 
 Function burnTime {
   Parameter nodeDV.
-  List engines in allEngines.
-  Local availableEngines to list().
-  For eng in allEngines {
-    If eng:ignition {
-      availableEngines:add(eng).
-    }
-  }.
-  Local availableIsp is averageIsp(availableEngines).
+  Local availableIsp is averageIspAt(availableEngines(),ship:q).
   Return 9.80665 * mass * availableIsp * (1 - constant:e ^ (-nodeDV / (9.80665 * availableIsp))) / ship:availablethrust.
 }.
