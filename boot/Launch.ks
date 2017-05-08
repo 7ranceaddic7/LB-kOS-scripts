@@ -1,7 +1,7 @@
 Copypath("0:/Functions/executeNode","1:").
 Run once "executeNode".
 
-Runpath("0:/boot/preferences").
+Runpath("0:/preferences").
 
 Print "Launching in 5 seconds.".
 Wait 5.

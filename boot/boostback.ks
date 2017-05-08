@@ -5,9 +5,8 @@ Run once "availableEngines".
 Copypath("0:/Functions/averageIsp","1:").
 Run once "averageIsp".
 
-Runpath("0:/boot/preferences").
+Runpath("0:/preferences").
 
-Print "Setting up.".
 Set launchLongitude to geoposition:lng.
 Set radarOffset to alt:radar.
 Print "Radar offset: " + round(radarOffset,2) + "m".
@@ -39,31 +38,35 @@ For eachTank in reserveTanks {
   }.
 }.
 reserveTanks:add(boosterEngine).
-Set sepDV to landingDV(reserveTanks).
 Print "Waiting 5s for separation.".
 Wait 5.
+Set landingIsp to averageIspAt(availableEngines(),1).
+Set sepDV to landingDV(landingIsp).
 Print "Enabling RCS.".
 RCS on.
 Print "Steering west.".
 Set dueWest to heading(270,0) + R(0,0,270).
 Lock dueWestNoRoll to r(dueWest:pitch,dueWest:yaw,facing:roll).
 Lock steering to dueWestNoRoll.
+Set steeringManager:maxStoppingTime to 5.
+Set steeringManager:pitchPID:KD to 2.
+Set steeringManager:yawPID:KD to 2.
 set steeringStartTime to time:seconds.
 Print "Waiting for steering...".
 Lock differenceFromWest to vectorangle(facing:forevector,dueWestNoRoll:forevector).
-Until differenceFromWest < 2 {
+Until differenceFromWest < 3 {
   Print "   Difference from west: " + round(differenceFromWest,2).
   Wait 1.
 }.
 Print "Steering time was " + round(time:seconds - steeringStartTime,2) + "s".
-Set steeredDV to landingDV(reserveTanks).
+Set steeredDV to landingDV(landingIsp).
 Print "Est. impact distance from launch: " + round(impactDistance(),3) + "km".
 Print "Preparing to boost back.".
 Set boostingBack to false.
 Set overshooting to false.
 Set emergencyAbort to false.
 Set cancelAbort to false.
-When landingDV( reserveTanks) < 400 or cancelAbort then {
+When landingDV(landingIsp) < 400 or cancelAbort then {
   If boostingBack or overshooting {
     Print "Aborting site selection: landing capacity < 400 dv".
     Lock throttle to 0.
@@ -73,14 +76,15 @@ When landingDV( reserveTanks) < 400 or cancelAbort then {
   }
   Else print "Cancelling abort check.".
 }.
+Set boostbackStartTime to time:seconds.
 Print "Boosting back!".
 Set boostingBack to true.
 Lock throttle to 1.
 Until not boostingBack {
   Set currentImpactDistance to impactDistance().
   Print "   Est. impact distance from launch: " + round(currentImpactDistance,3) + "km".
-  If currentImpactDistance < 50 and not emergencyAbort {
-    Lock throttle to max(currentImpactDistance / 50, 0.05).
+  If currentImpactDistance < 25 and not emergencyAbort {
+    Lock throttle to max(currentImpactDistance / 25, 0.05).
   }.
   If currentImpactDistance < 1 {
     Print "Est. impact distance from launch < 1km!".
@@ -105,7 +109,8 @@ If not emergencyAbort {
   }.
 }.
 Set cancelAbort to true.
-Set boostedDV to landingDV(reserveTanks).
+Print "Boostback time was " + round(time:seconds - boostbackStartTime,2) + "s".
+Set boostedDV to landingDV(landingIsp).
 Lock throttle to 0.
 Print "Releasing control until landing.".
 RCS off.
@@ -121,7 +126,7 @@ Wait until altitude < 5000.
 Print "Enabling RCS.".
 RCS on.
 Hoverslam(radarOffset).
-Set finalDV to landingDV(reserveTanks).
+Set finalDV to landingDV(landingIsp).
 Print "Sea-level delta-V: ".
 Print "   Separation: " + round(sepDV,2) + " available".
 Print "   Steering:   " + round(sepDV - steeredDV,2) + " consumed".
@@ -130,15 +135,14 @@ Print "   Landing:    " + round(boostedDV - finalDV,2) + " consumed".
 Print "   Final:      " + round(finalDV,2) + " available".
 
 Function landingDV {
-  Parameter availableTanks.
-  Local landingEngines is availableEngines().
-  Local propellantMass to 0. //replace this with AggregateResource
-  For landingTank in availableTanks {
-    For landingResource in landingTank:resources {
-      Set propellantMass to propellantMass + (landingResource:amount * landingResource:density).
-    }.
-  }.
-  return ln(mass / (mass - propellantMass)) * averageIspAt(landingEngines,0) * 9.81.
+  Parameter myIsp.
+  Local propellantMass is 0.
+  Local resourceList is list().
+  List resources in resourceList.
+  For res in resourceList {
+    Set propellantMass to propellantMass + res:amount * res:density. //assumes we can burn all resources
+  }
+  return ln(mass / (mass - propellantMass)) * myIsp * 9.81.
 }.
 
 //Impact determination adapted from
@@ -151,11 +155,11 @@ Function impactDistance {
   Local someVector is somePosition - body:position.
   Local someAltitude is ship:altitude.
   Until someAltitude < 75 {
-    Set someTime to someTime + 2.
+    Set someTime to someTime + 5.
     Set somePosition to positionat(ship, someTime).
     Set someVector to somePosition - body:position.
     Set someAltitude to someVector:mag - body:radius.
   }.
-  Local impactLongitude is body:geopositionof(somePosition):lng - ((someTime:seconds - time:seconds)/60)
-  return abs(impactLongitude - launchLongitude) * (2 * constant:pi * body:radius / 360 / 1000).
+  Local impactLongitude is body:geopositionof(somePosition):lng - ((someTime:seconds - time:seconds)/60).
+  Return abs(impactLongitude - launchLongitude) * (2 * constant:pi * body:radius / 360 / 1000).
 }.

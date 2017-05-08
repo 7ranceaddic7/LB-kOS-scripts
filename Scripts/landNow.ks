@@ -5,5 +5,6 @@ If homeConnection:isConnected {
 }.
 Run once "hoverslam". //Our bootfile should have grabbed a copy
 
+Print "Waiting until vertspeed < 0...".
 Wait until verticalspeed < -5.
 Hoverslam(1.5). //or take some input to get radar offset

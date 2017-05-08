@@ -17,21 +17,23 @@ Function hoverslam { //deal with lazyglobal scope
   Print "Usable thrust is " + round(myThrust,2) + " out of " + round(ship:availablethrust,2) + " possible.".
   Lock maxAcceleration to myThrust / ship:mass - localGravity.
   Lock stoppingDistance to ship:velocity:surface:sqrmagnitude / (2 * maxAcceleration).
-  Lock idealThrottle to stoppingDistance / srfDistance().
-  Wait until srfDistance() - 500 < stoppingDistance.
+  Lock surfaceDistance to srfDistance(someOffset).
+  Lock idealThrottle to stoppingDistance / surfaceDistance.
+  Wait until surfaceDistance - 500 < stoppingDistance.
   Print "Zeroing warp.".
   Set warp to 0.
-  Wait until srfDistance() < stoppingDistance.
+  Wait until surfaceDistance < stoppingDistance.
   Print "Performing hoverslam!".
   Lock throttle to idealThrottle.
   Gear on.
-  //Wait until verticalspeed > -10.
-  //Lock srfDistance to alt:radar - someOffset.
-  Wait until verticalspeed > -5.
+  Wait until alt:radar - someOffset < 250.
+  Lock surfaceDistance to alt:radar - someOffset.
+  Wait until verticalspeed > -7.
   Print "Touching down.".
-  Lock throttle to localGravity / (maxAcceleration + localGravity).
-  Print "Setting throttle to " + round(throttle * 100,2) + "%".
+  Lock throttle to localGravity / (maxAcceleration + localGravity) * 0.8.
   Lock steering to R(up:pitch,up:yaw,facing:roll).
+  Wait until verticalspeed < -6 or status = "LANDED" or status = "SPLASHED" or verticalspeed > -1.
+  Lock throttle to localGravity / (maxAcceleration + localGravity).
   Wait until status = "LANDED" or status = "SPLASHED" or verticalspeed > -1.
   Set ship:control:pilotmainthrottle to 0.
   Unlock throttle.
@@ -57,9 +59,13 @@ Function angledThrust {
 }.
 
 Function srfDistance {
-  Local someDistance to alt:radar - someOffset.
+  Parameter myOffset.
+  Local someDistance to alt:radar - myOffset.
   If addons:TR:hasImpact {
-    Set someDistance to addons:TR:impactPos:distance //- someOffset.
+    Set someDistance to addons:TR:impactPos:distance - myOffset.
+    If addons:TR:impactPOS:terrainHeight < 0 {
+      Set someDistance to someDistance + addons:TR:impactPOS:terrainHeight. //crude
+    }.
   }.
   Return someDistance.
 }.
