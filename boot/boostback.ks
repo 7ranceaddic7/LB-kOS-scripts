@@ -48,7 +48,7 @@ Print "Steering west.".
 Set dueWest to heading(270,0) + R(0,0,270).
 Lock dueWestNoRoll to r(dueWest:pitch,dueWest:yaw,facing:roll).
 Lock steering to dueWestNoRoll.
-Set steeringManager:maxStoppingTime to 5.
+Set steeringManager:maxStoppingTime to 10.
 Set steeringManager:pitchPID:KD to 2.
 Set steeringManager:yawPID:KD to 2.
 set steeringStartTime to time:seconds.
@@ -62,16 +62,15 @@ Print "Steering time was " + round(time:seconds - steeringStartTime,2) + "s".
 Set steeredDV to landingDV(landingIsp).
 Print "Est. impact distance from launch: " + round(impactDistance(),3) + "km".
 Print "Preparing to boost back.".
+Set targetDistance to -2.5.
 Set boostingBack to false.
-Set overshooting to false.
 Set emergencyAbort to false.
 Set cancelAbort to false.
 When landingDV(landingIsp) < 400 or cancelAbort then {
-  If boostingBack or overshooting {
+  If boostingBack {
     Print "Aborting site selection: landing capacity < 400 dv".
     Lock throttle to 0.
     Set boostingBack to false.
-    Set overshooting to false.
     Set emergencyAbort to true.
   }
   Else print "Cancelling abort check.".
@@ -83,30 +82,15 @@ Lock throttle to 1.
 Until not boostingBack {
   Set currentImpactDistance to impactDistance().
   Print "   Est. impact distance from launch: " + round(currentImpactDistance,3) + "km".
-  If currentImpactDistance < 25 and not emergencyAbort {
-    Lock throttle to max(currentImpactDistance / 25, 0.05).
+  If (currentImpactDistance - targetDistance) < 25 and not emergencyAbort {
+    Lock throttle to max((currentImpactDistance - targetDistance) / 25, 0.05).
   }.
-  If currentImpactDistance < 1 {
-    Print "Est. impact distance from launch < 1km!".
+  If (currentImpactDistance - targetDistance) < 0 {
+    Print "Landing target reached.".
     Lock throttle to 0.
     Set boostingBack to false.
   }.
-  Wait 0.1.
-}.
-If not emergencyAbort {
-  Print "Intentionally overshooting.".
-  Set overshooting to true.
-  Lock throttle to 0.05.
-  Until not overshooting {
-    Set currentImpactDistance to impactDistance().
-    Print "   Est. impact distance from launch: " + round(currentImpactDistance,3) + "km".
-    If currentImpactDistance > 2 {
-      Print "Overshoot complete.".
-      Lock throttle to 0.
-      Set overshooting to false.
-    }.
-    Wait 0.1.
-  }.
+  Wait 0.2.
 }.
 Set cancelAbort to true.
 Print "Boostback time was " + round(time:seconds - boostbackStartTime,2) + "s".
@@ -125,7 +109,7 @@ Lock steering to R(srfretrograde:pitch,srfretrograde:yaw,facing:roll).
 Wait until altitude < 5000.
 Print "Enabling RCS.".
 RCS on.
-Hoverslam(radarOffset).
+Hoverslam(radarOffset/0.75).
 Set finalDV to landingDV(landingIsp).
 Print "Sea-level delta-V: ".
 Print "   Separation: " + round(sepDV,2) + " available".
@@ -133,6 +117,7 @@ Print "   Steering:   " + round(sepDV - steeredDV,2) + " consumed".
 Print "   Boostback:  " + round(steeredDV - boostedDV,2) + " consumed".
 Print "   Landing:    " + round(boostedDV - finalDV,2) + " consumed".
 Print "   Final:      " + round(finalDV,2) + " available".
+Print "   Total:      " + round(sepDV - finalDV,2) + " consumed".
 
 Function landingDV {
   Parameter myIsp.
@@ -155,11 +140,11 @@ Function impactDistance {
   Local someVector is somePosition - body:position.
   Local someAltitude is ship:altitude.
   Until someAltitude < 75 {
-    Set someTime to someTime + 5.
+    Set someTime to someTime + 3.
     Set somePosition to positionat(ship, someTime).
     Set someVector to somePosition - body:position.
     Set someAltitude to someVector:mag - body:radius.
   }.
   Local impactLongitude is body:geopositionof(somePosition):lng - ((someTime:seconds - time:seconds)/60).
-  Return abs(impactLongitude - launchLongitude) * (2 * constant:pi * body:radius / 360 / 1000).
+  Return (impactLongitude - launchLongitude) * (2 * constant:pi * body:radius / 360 / 1000).
 }.

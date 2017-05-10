@@ -2,4 +2,12 @@ AverageIsp: replace fuel flow calc with engine:fuelflow
 
 Create reentry script to land at KSC.
 
-Boostback/impactLongitude: Calculate impact longitude from true velocity
+Boostback/impactLongitude: Calculate impact longitude from true anomaly
+
+
+Suggested booster values:
+	2.5 sea TWR (full)
+	2000 sea dv reserved for boostback/landing
+Suggested payload capacity:
+	Second stage + payload = 25% to 50% of booster mass
+	Net launchpad TWR: 1.666 - 2

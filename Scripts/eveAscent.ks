@@ -1,34 +1,32 @@
 Copypath("0:/Functions/circularize","1:").
 Run once "circularize".
+Copypath("0:/Functions/twr","1:").
+Run once "twr".
 
 Runpath("0:/preferences").
 
-Print "Launching in 5 seconds.".
-Wait 5.
-gravityTurn(75000).
+eveTurn(100000).
 Circularize().
-Print "Launch complete.".
+Print "Ascent complete.".
 Set warp to 0.
 SAS on.
 
-Function gravityTurn { //deal with lazyglobal scope eventually.
+Function eveTurn { //deal with lazyglobal scope eventually.
   Parameter targetAltitude.
   Lock steering to heading(90,90) + R(0,0,270).
   Print "Launch!".
-  Stage.
-  Wait 1.
-  Print "Beginning trajectory...".
-  Lock desiredPitch to 90 - altitude * 0.0045.
+  Lock throttle to 3/twr().
+  Gear off.
+  Lock desiredPitch to max(90 - (altitude - 10000) * 0.001125,0).
   Lock desiredHeading to heading(90,desiredPitch) + R(0,0,270).
   Lock steering to desiredHeading.
-  Lock pitchDifference to vectorangle(facing:forevector,desiredHeading:forevector).
-  Until altitude > 10000 {
-    Print "Alt: " + round(altitude,0) + "m; Target: " + round(desiredPitch,0) + "; Diff: " + round(pitchDifference,2).
-    Wait 1.
+  When burnout() {
+    Stage.
+    Print "Staging!".
+    Preserve.
   }.
-  Print "Continuing trajectory...".
-  Lock desiredPitch to 45 - (altitude - 10000) * 0.0015.
-  Until altitude > 40000 or apoapsis > targetAltitude {
+  Lock pitchDifference to vectorangle(facing:forevector,desiredHeading:forevector).
+  Until altitude > 90000 or apoapsis > targetAltitude {
     Print "Alt: " + round(altitude,0) + "m; Target: " + round(desiredPitch,0) + "; Diff: " + round(pitchDifference,2).
     Wait 1.
   }.
@@ -42,8 +40,8 @@ Function gravityTurn { //deal with lazyglobal scope eventually.
   Print "Switching to prograde.".
   Lock steering to r(prograde:pitch,prograde:yaw,facing:roll).
   Print "Coasting to circularization...".
-  Until altitude > 70000 {
-    If throttle = 0 and apoapsis < 70000 {
+  Until altitude > 90000 {
+    If throttle = 0 and apoapsis < 90000 {
       Print "   Raising apoapsis again.".
       Lock throttle to 1.
     }.
@@ -56,4 +54,15 @@ Function gravityTurn { //deal with lazyglobal scope eventually.
   Print "Exited atmosphere.".
   Lock throttle to 0.
   Return.
+}.
+
+Function burnout {
+  Local myEngines is list().
+  List engines in myEngines.
+  For eng in myEngines {
+    If eng:flameout {
+      Return true.
+    }.
+  }.
+  Return false.
 }.
