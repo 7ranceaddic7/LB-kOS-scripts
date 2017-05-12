@@ -1,6 +1,3 @@
-//This is the function definition.
-//For a script that can be run from the terminal, run landNow.
-
 Copypath("0:/Functions/twr","1:").
 Run once "twr".
 
@@ -13,7 +10,7 @@ Function hoverslam { //deal with lazyglobal scope
   Lock steering to R(srfretrograde:pitch,srfretrograde:yaw,facing:roll).
   Print "Calculating landing.".
   Lock localGravity to body:mu / (altitude + body:radius) ^ 2.
-  Print "Usable thrust is " + round(angledThrust(),2) + " out of " + round(ship:availablethrust,2) + " possible.".
+  Print "Usable thrust is " + round(angledThrust(),2) + " of " + round(ship:availablethrust,2) + " possible.".
   Lock maxAcceleration to angledThrust() / ship:mass - localGravity.
   Lock stoppingDistance to ship:velocity:surface:sqrmagnitude / (2 * maxAcceleration).
   Lock surfaceDistance to srfDistance(someOffset).
@@ -47,9 +44,9 @@ Function hoverslam { //deal with lazyglobal scope
 Function srfDistance {
   Parameter myOffset.
   Local someDistance to alt:radar - myOffset.
-  If addons:TR:hasImpact {
-    If addons:TR:impactPOS:terrainHeight > 0 or not body:atmosphere:exists { //not sure if impactpos:distance "sees" water
-      Set someDistance to addons:TR:impactPos:distance - myOffset.
+  If addons:tr:hasImpact {
+    If addons:tr:impactPOS:terrainHeight > 0 or not body:atm:exists { //not sure if impactpos:distance "sees" water
+      Set someDistance to addons:tr:impactPos:distance - myOffset.
     }.
   }.
   Return someDistance.

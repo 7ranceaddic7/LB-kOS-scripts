@@ -1,8 +1,6 @@
-//Just an executable alias for the function.
-
 If homeConnection:isConnected {
-  Copypath("0:/Functions/executeNode","1:"). //grab latest version if possible
+  Copypath("0:/Functions/executeNode","1:"). 
 }.
-Run once "executeNode". //Our bootfile should have grabbed a copy
+Run once "executeNode".
 
 executeNode().

@@ -1,6 +1,3 @@
-//This is the function definition.
-//For a script that can be run from the terminal, run executeNext.
-
 Copypath("0:/Functions/burnTime","1:").
 Run once "burnTime".
 
@@ -14,18 +11,19 @@ Function executeNode {
   SAS off.
   Lock steering to r(myNode:burnvector:direction:pitch,myNode:burnvector:direction:yaw,facing:roll).
   Print "Waiting to execute...".
-  Wait until burnETA < 20.
+  Wait until burnETA < 15.
   Print "Zeroing warp.".
   Set warp to 0.
   Wait until burnETA < 0.25.
   Print "Executing node.".
   Lock throttle to 1.
   Local executionStart is time:seconds.
-  Wait until myNode:deltav:mag < 20.
+  Wait until burnTime(myNode:deltav:mag) < 10.
   Print "Zeroing warp.".
   Set warp to 0.
+  Wait until burnTime(myNode:deltav:mag) < 2.
   Print "Completing execution.".
-  Lock throttle to myNode:deltav:mag / 20.
+  Lock throttle to myNode:deltav:mag / (ship:availablethrust / mass).
   Wait until myNode:deltav:mag < 0.1.
   Lock throttle to 0.
   Print "Execution complete.".

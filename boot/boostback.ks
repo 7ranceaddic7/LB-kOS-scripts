@@ -136,12 +136,12 @@ Function landingDV {
 Function impactDistance {
   //Alternate method: calculate from true anomaly.
   Local someTime is time.
-  Local somePosition is positionat(ship, someTime).
+  Local somePosition is positionat(ship,someTime).
   Local someVector is somePosition - body:position.
   Local someAltitude is ship:altitude.
   Until someAltitude < 75 {
     Set someTime to someTime + 3.
-    Set somePosition to positionat(ship, someTime).
+    Set somePosition to positionat(ship,someTime).
     Set someVector to somePosition - body:position.
     Set someAltitude to someVector:mag - body:radius.
   }.

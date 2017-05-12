@@ -1,6 +1,9 @@
-AverageIsp: replace fuel flow calc with engine:fuelflow
+Eve ascent: refine (pitch over more for final stage?)
 
-Create reentry script to land at KSC.
+Create minmus plane changer
+
+
+AverageIsp: replace fuel flow calc with engine:fuelflow
 
 Boostback/impactLongitude: Calculate impact longitude from true anomaly
 

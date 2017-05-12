@@ -7,6 +7,6 @@ Run once "availableEngines".
 
 Function burnTime {
   Parameter nodeDV.
-  Local availableIsp is averageIspAt(availableEngines(),ship:q).
+  Local availableIsp is averageIspAt(availableEngines(),0).
   Return 9.80665 * mass * availableIsp * (1 - constant:e ^ (-nodeDV / (9.80665 * availableIsp))) / ship:availablethrust.
 }.

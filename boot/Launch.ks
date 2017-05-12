@@ -3,13 +3,15 @@ Run once "circularize".
 
 Runpath("0:/preferences").
 
-Print "Launching in 5 seconds.".
-Wait 5.
-gravityTurn(75000).
-Circularize().
-Print "Launch complete.".
-Set warp to 0.
-SAS on.
+If status = "PRELAUNCH" {
+  Print "Launching in 5 seconds.".
+  Wait 5.
+  gravityTurn(75000).
+  Circularize().
+  Print "Launch complete.".
+  Set warp to 0.
+  SAS on.
+}.
 
 Function gravityTurn { //deal with lazyglobal scope eventually.
   Parameter targetAltitude.

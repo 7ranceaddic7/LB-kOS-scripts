@@ -8,7 +8,9 @@ Copypath("0:/Scripts/landNow","1:").
 
 Runpath("0:/preferences").
 
-Wait until periapsis > 70000 or abort.
-If abort {
-  runpath("1:/landNow").
+If status = "PRELAUNCH" {
+  Wait until periapsis > 70000 or abort.
+  If abort {
+    Runpath("1:/landNow",1.5).
+  }.
 }.

@@ -13,46 +13,40 @@ SAS on.
 
 Function eveTurn { //deal with lazyglobal scope eventually.
   Parameter targetAltitude.
+  SAS off.
   Lock steering to heading(90,90) + R(0,0,270).
   Print "Launch!".
-  Lock throttle to 3/twr().
+  Lock throttle to 3/max(twr(),0.0001).
   Gear off.
-  Lock desiredPitch to max(90 - (altitude - 10000) * 0.001125,0).
+  Lock desiredPitch to 90 - max((altitude - 15000) * 0.0012,0).
   Lock desiredHeading to heading(90,desiredPitch) + R(0,0,270).
   Lock steering to desiredHeading.
-  When burnout() {
+  When burnout() then {
     Stage.
-    Print "Staging!".
+    Print "Staging.".
     Preserve.
   }.
   Lock pitchDifference to vectorangle(facing:forevector,desiredHeading:forevector).
-  Until altitude > 90000 or apoapsis > targetAltitude {
+  Set steeringCheck to true.
+  When pitchDifference > 10 then {
+    if steeringCheck {
+      Print "Steering error; unlocking throttle.".
+      Unlock throttle.
+      Set ship:control:pilotmainthrottle to 0.
+    }.
+  }.
+  Until apoapsis > targetAltitude {
     Print "Alt: " + round(altitude,0) + "m; Target: " + round(desiredPitch,0) + "; Diff: " + round(pitchDifference,2).
     Wait 1.
-  }.
-  If apoapsis < targetAltitude {
-    Print "Raising apoapsis to target altitude.".
-    Lock steering to heading(90,0) + R(0,0,270).
-    Wait until apoapsis > targetAltitude.
   }.
   Print "Suborbital trajectory reached.".
   Lock throttle to 0.
   Print "Switching to prograde.".
   Lock steering to r(prograde:pitch,prograde:yaw,facing:roll).
+  Set steeringCheck to false.
   Print "Coasting to circularization...".
-  Until altitude > 90000 {
-    If throttle = 0 and apoapsis < 90000 {
-      Print "   Raising apoapsis again.".
-      Lock throttle to 1.
-    }.
-    If throttle > 0 and apoapsis > targetAltitude {
-      Print "   Coasting again.".
-      Lock throttle to 0.
-    }.
-    Wait 0.1.
-  }.
+  Wait until altitude > 90000.
   Print "Exited atmosphere.".
-  Lock throttle to 0.
   Return.
 }.
 
