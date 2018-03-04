@@ -6,6 +6,10 @@ Copypath("0:/Functions/hoverslam","1:").
 Run once "hoverslam".
 Copypath("0:/Scripts/landNow","1:").
 
+Copypath("0:/Functions/circularize","1:").
+Run once "circularize".
+Copypath("0:/Scripts/vacuumAscent","1:").
+
 Runpath("0:/preferences").
 
 If status = "PRELAUNCH" {

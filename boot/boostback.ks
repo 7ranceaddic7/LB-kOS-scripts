@@ -39,7 +39,13 @@ For eachTank in reserveTanks {
 }.
 reserveTanks:add(boosterEngine).
 Print "Waiting 5s for separation.".
-Wait 5.
+Wait 2.5.
+Print "Steering retrograde.".
+Lock steering to R(srfretrograde:pitch,srfretrograde:yaw,facing:roll).
+Wait 2.4.
+Lock throttle to 0.01. //or else thrust will read 0 due to prior flameout
+Wait 0.1.
+Lock throttle to 0.
 Set landingIsp to averageIspAt(availableEngines(),1).
 Set sepDV to landingDV(landingIsp).
 Print "Enabling RCS.".
@@ -62,7 +68,7 @@ Print "Steering time was " + round(time:seconds - steeringStartTime,2) + "s".
 Set steeredDV to landingDV(landingIsp).
 Print "Est. impact distance from launch: " + round(impactDistance(),3) + "km".
 Print "Preparing to boost back.".
-Set targetDistance to -2.5.
+Set targetDistance to -5.
 Set boostingBack to false.
 Set emergencyAbort to false.
 Set cancelAbort to false.
@@ -96,16 +102,16 @@ Set cancelAbort to true.
 Print "Boostback time was " + round(time:seconds - boostbackStartTime,2) + "s".
 Set boostedDV to landingDV(landingIsp).
 Lock throttle to 0.
-Print "Releasing control until landing.".
+Print "Steering retrograde.".
+Lock steering to R(srfretrograde:pitch,srfretrograde:yaw,facing:roll).
 RCS off.
 Unlock steering.
 Set ship:control:pilotmainthrottle to 0.
 Unlock throttle.
 Print "Waiting to land...".
 Wait until altitude < 15000.
-Print "Deploying brakes.".
+Print "Deploying gridfins.".
 Brakes on.
-Lock steering to R(srfretrograde:pitch,srfretrograde:yaw,facing:roll).
 Wait until altitude < 5000.
 Print "Enabling RCS.".
 RCS on.

@@ -24,11 +24,11 @@ Function hoverslam { //deal with lazyglobal scope
   Gear on.
   Wait until alt:radar - someOffset < 250.
   Lock surfaceDistance to alt:radar - someOffset.
-  Wait until verticalspeed > -7.
+  Wait until verticalspeed > -6.
   Print "Touching down.".
   Lock throttle to 0.8/angledTWR().
   Lock steering to R(up:pitch,up:yaw,facing:roll).
-  Wait until verticalspeed < -6 or status = "LANDED" or status = "SPLASHED" or verticalspeed > -1.
+  Wait until verticalspeed < -5 or status = "LANDED" or status = "SPLASHED" or verticalspeed > -1.
   Lock throttle to 1/angledTWR().
   Wait until status = "LANDED" or status = "SPLASHED" or verticalspeed > -1.
   Set ship:control:pilotmainthrottle to 0.

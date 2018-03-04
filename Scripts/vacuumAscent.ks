@@ -13,17 +13,18 @@ Wait 2.
 Lock steering to heading(90,45) + R(0,0,270).
 Wait 3.
 Until apoapsis > targetAltitude {
-  If addons:tr:impactPos:terrainHeight > altitudeAt(time + 60) {
-    If addons:tr:impactPos:terrainHeight > altitudeAt(time + 30) {
-      Print "Impact height: " + round(addons:tr:impactPos:terrainHeight,0) + "m; Alt in 30s: " + round(altitudeAt(time + 30),0) + "m".
-      Lock steering to heading(90,90) + R(0,0,270).
+  If addons:tr:hasImpact {
+    If addons:tr:impactPos:terrainHeight > altitudeAt(time + 60) {
+      If addons:tr:impactPos:terrainHeight > altitudeAt(time + 30) {
+        Print "Impact height: " + round(addons:tr:impactPos:terrainHeight,0) + "m; Alt in 30s: " + round(altitudeAt(time + 30),0) + "m".
+        Lock steering to heading(90,90) + R(0,0,270).
+      } else {
+        Print "Impact height: " + round(addons:tr:impactPos:terrainHeight,0) + "m; Alt in 60s: " + round(altitudeAt(time + 60),0) + "m".
+        Lock steering to heading(90,45) + R(0,0,270).
+      }
     } else {
-      Print "Impact height: " + round(addons:tr:impactPos:terrainHeight,0) + "m; Alt in 60s: " + round(altitudeAt(time + 60),0) + "m".
-      Lock steering to heading(90,45) + R(0,0,270).
+      Lock steering to heading(90,5) + R(0,0,270).
     }
-  }
-  else {
-    Lock steering to heading(90,0) + R(0,0,270).
   }.
   Wait 0.25.
 }.
