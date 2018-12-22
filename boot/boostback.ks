@@ -10,8 +10,8 @@ Runpath("0:/preferences").
 Set launchLongitude to geoposition:lng.
 Set radarOffset to alt:radar.
 Print "Radar offset: " + round(radarOffset,2) + "m".
-Set boosterTag to core:part:tag + "booster".
-Set boosterEngine to ship:partstagged(boosterTag)[0].
+Set engineTag to core:part:tag + "engine".
+Set boosterEngine to ship:partstagged(engineTag)[0].
 Print "Waiting to stage...".
 Wait until boosterEngine:flameout.
 Print "Staging.".
