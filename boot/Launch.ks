@@ -39,13 +39,13 @@ Function gravityTurn { //deal with lazyglobal scope eventually.
   Lock steering to desiredHeading.
   Lock pitchDifference to vectorangle(facing:forevector,desiredHeading:forevector).
   Until altitude > 10000 {
-    Print "Alt: " + round(altitude,0) + "m; Target: " + round(desiredPitch,0) + "; Diff: " + round(pitchDifference,2).
+    //Print "Alt: " + round(altitude,0) + "m; Target: " + round(desiredPitch,0) + "; Diff: " + round(pitchDifference,2).
     Wait 1.
   }.
   Print "Continuing trajectory...".
   Lock desiredPitch to 45 - (altitude - 10000) * 0.0015.
   Until altitude > 40000 or apoapsis > targetAltitude {
-    Print "Alt: " + round(altitude,0) + "m; Target: " + round(desiredPitch,0) + "; Diff: " + round(pitchDifference,2).
+    //Print "Alt: " + round(altitude,0) + "m; Target: " + round(desiredPitch,0) + "; Diff: " + round(pitchDifference,2).
     Wait 1.
   }.
   If apoapsis < targetAltitude {
