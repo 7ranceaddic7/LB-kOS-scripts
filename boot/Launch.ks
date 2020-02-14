@@ -18,48 +18,38 @@ Copypath("0:/Scripts/vacuumAscent","1:").
 Runpath("0:/preferences").
 
 If status = "PRELAUNCH" {
+  Set safeOrbit to body:atm:height + 5000.
   Print "Launching in 5 seconds.".
   Wait 5.
-  gravityTurn(75000).
+  gravityTurn(safeOrbit).
   Circularize().
   Print "Launch complete.".
   Set warp to 0.
   SAS on.
 }.
 
-Function gravityTurn { //deal with lazyglobal scope eventually.
+Function gravityTurn { //deal with lazyglobal scope eventually
   Parameter targetAltitude.
   Lock steering to heading(90,90) + R(0,0,270).
   Print "Launch!".
   Stage.
   Wait 1.
   Print "Beginning trajectory...".
-  Lock desiredPitch to 90 - altitude * 0.0045.
+  Lock desiredPitch to 90 - (1 - body:atm:altitudePressure(altitude) ^ (1/3)) * 90. //the secret sauce
   Lock desiredHeading to heading(90,desiredPitch) + R(0,0,270).
   Lock steering to desiredHeading.
   Lock pitchDifference to vectorangle(facing:forevector,desiredHeading:forevector).
-  Until altitude > 10000 {
-    //Print "Alt: " + round(altitude,0) + "m; Target: " + round(desiredPitch,0) + "; Diff: " + round(pitchDifference,2).
-    Wait 1.
-  }.
-  Print "Continuing trajectory...".
-  Lock desiredPitch to 45 - (altitude - 10000) * 0.0015.
-  Until altitude > 40000 or apoapsis > targetAltitude {
-    //Print "Alt: " + round(altitude,0) + "m; Target: " + round(desiredPitch,0) + "; Diff: " + round(pitchDifference,2).
-    Wait 1.
-  }.
-  If apoapsis < targetAltitude {
-    Print "Raising apoapsis to target altitude.".
-    Lock steering to heading(90,0) + R(0,0,270).
-    Wait until apoapsis > targetAltitude.
+  Until apoapsis > targetAltitude {
+    Print "Alt: " + round(altitude,0) + "m; Prs: " + round(body:atm:altitudePressure(altitude),3) + "atm; Trgt: " + round(desiredPitch,1) + "; Diff: " + round(pitchDifference,1).
+    Wait 0.1.
   }.
   Print "Suborbital trajectory reached.".
   Lock throttle to 0.
-  Print "Switching to prograde.".
+  Print "Steering to prograde.".
   Lock steering to r(prograde:pitch,prograde:yaw,facing:roll).
   Print "Coasting to circularization...".
-  Until altitude > 70000 {
-    If throttle = 0 and apoapsis < 70000 {
+  Until altitude > body:atm:height - 5000 {
+    If throttle = 0 and apoapsis < body:atm:height {
       Print "   Raising apoapsis again.".
       Lock throttle to 1.
     }.
@@ -69,7 +59,7 @@ Function gravityTurn { //deal with lazyglobal scope eventually.
     }.
     Wait 0.1.
   }.
-  Print "Exited atmosphere.".
+  Print "Exiting atmosphere.".
   Lock throttle to 0.
   Return.
 }.
