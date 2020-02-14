@@ -13,7 +13,7 @@ Copypath("0:/Scripts/vacuumAscent","1:").
 Runpath("0:/preferences").
 
 If status = "PRELAUNCH" {
-  Wait until periapsis > 70000 or abort.
+  Wait until periapsis > body:atm:height or abort.
   If abort {
     Runpath("1:/landNow",1.5).
   }.
