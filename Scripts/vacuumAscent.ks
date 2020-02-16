@@ -1,8 +1,6 @@
 Copypath("0:/Functions/circularize","1:").
 Run once "circularize".
 
-Runpath("0:/preferences").
-
 Set targetAltitude to minSafeAlt().
 
 SAS off.
@@ -32,17 +30,7 @@ Lock throttle to 0.
 Circularize().
 
 Function minSafeAlt {
-  If body:name = "Mun" return 15000.
-  If body:name = "Minmus" return 10000.
-  If body:name = "Moho" return 15000.
-  If body:name = "Gilly" return 10000.
-  If body:name = "Ike" return 20000.
-  If body:name = "Dres" return 15000.
-  If body:name = "Vall" return 15000.
-  If body:name = "Tylo" return 20000.
-  If body:name = "Bop" return 30000.
-  If body:name = "Pol" return 10000.
-  If body:name = "Eeloo" return 10000.
+  Return 25000.
 }.
 
 Function altitudeAt {
