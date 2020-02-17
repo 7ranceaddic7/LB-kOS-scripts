@@ -21,7 +21,7 @@ Copypath("0:/Scripts/vacuumAscent","1:").
 Runpath("0:/preferences").
 
 If status = "PRELAUNCH" {
-  Set desiredOrbit to 250000.
+  Set desiredOrbit to (body:atm:height + 5000) * (3 + 1/3).
   Print "Launching in 5 seconds.".
   Wait 5.
   gravityTurn(desiredOrbit).

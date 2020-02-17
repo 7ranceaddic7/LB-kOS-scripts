@@ -24,7 +24,7 @@ If status = "PRELAUNCH" {
   Set safeOrbit to body:atm:height + 5000.
   Print "Launching in 5 seconds.".
   Wait 5.
-  gravityTurn(safeOrbit,1). //second parameter specifies polar orbit
+  gravityTurn(safeOrbit,0). //second parameter specifies polar orbit
   Circularize().
   Print "Launch complete.".
   Set warp to 0.
