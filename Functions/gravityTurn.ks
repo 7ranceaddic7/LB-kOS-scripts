@@ -2,8 +2,10 @@ Function gravityTurn {
   Parameter targetAltitude, degFromNorth is 90.
   Set startingPressure to body:atm:altitudePressure(altitude).
   Print "Target altitude is " + targetAltitude + "m.".
+  Set initialRoll to facing:roll.
   SAS off.
   Lock steering to heading(90,90) + R(0,0,270).
+  //Lock steering to heading(90,90,initialRoll).
   Print "Launch!".
   Stage.
   Wait 1. //clear the launch tower
@@ -32,7 +34,7 @@ Function gravityTurn {
   Print "Steering to prograde.".
   Lock steering to r(prograde:pitch,prograde:yaw,facing:roll).
   Print "Coasting to circularization...".
-  Until altitude > body:atm:height - 5000 {
+  Until altitude > body:atm:height {
     If throttle = 0 and apoapsis < body:atm:height {
       Print "   Raising apoapsis again.".
       Lock throttle to 1.
