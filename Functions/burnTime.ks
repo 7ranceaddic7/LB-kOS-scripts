@@ -1,8 +1,12 @@
 //Adapted from https://www.reddit.com/r/Kos/comments/3ftcwk/compute_burn_time_with_calculus/
 
-Copypath("0:/Functions/averageIsp","1:").
+If homeConnection:isConnected {
+  Copypath("0:/Functions/averageIsp","1:").
+}.
 Run once "averageIsp".
-Copypath("0:/Functions/availableEngines","1:").
+If homeConnection:isConnected {
+  Copypath("0:/Functions/availableEngines","1:").
+}.
 Run once "availableEngines".
 
 Function burnTime {

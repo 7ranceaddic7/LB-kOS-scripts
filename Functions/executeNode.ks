@@ -1,4 +1,6 @@
-Copypath("0:/Functions/burnTime","1:").
+If homeConnection:isConnected {
+  Copypath("0:/Functions/burnTime","1:").
+}.
 Run once "burnTime".
 
 Function executeNode {

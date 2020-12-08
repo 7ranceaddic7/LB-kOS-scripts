@@ -1,4 +1,6 @@
-Copypath("0:/Functions/twr","1:").
+If homeConnection:isConnected {
+  Copypath("0:/Functions/twr","1:").
+}.
 Run once "twr".
 
 //Adapted from https://github.com/mrbradleyjh/kOS-Hoverslam

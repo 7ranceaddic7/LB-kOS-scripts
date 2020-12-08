@@ -1,4 +1,6 @@
-Copypath("0:/Functions/circularize","1:").
+If homeConnection:isConnected {
+  Copypath("0:/Functions/circularize","1:").
+}.
 Run once "circularize".
 
 Set targetAltitude to minSafeAlt().

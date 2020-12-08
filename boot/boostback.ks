@@ -1,8 +1,14 @@
-Copypath("0:/Functions/hoverslam","1:").
+If homeConnection:isConnected {
+  Copypath("0:/Functions/hoverslam","1:").
+}.
 Run once "hoverslam".
-Copypath("0:/Functions/availableEngines","1:").
+If homeConnection:isConnected {
+  Copypath("0:/Functions/availableEngines","1:").
+}.
 Run once "availableEngines".
-Copypath("0:/Functions/averageIsp","1:").
+If homeConnection:isConnected {
+  Copypath("0:/Functions/averageIsp","1:").
+}.
 Run once "averageIsp".
 
 Runpath("0:/preferences").

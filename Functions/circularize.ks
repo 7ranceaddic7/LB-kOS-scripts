@@ -1,6 +1,8 @@
 //Adapted from https://www.reddit.com/r/Kos/comments/2wuo9o/what_is_the_easiest_way_to_circularize_while/?st=j1zx53ez&sh=9da227a7
 
-Copypath("0:/Functions/executeNode","1:").
+If homeConnection:isConnected {
+  Copypath("0:/Functions/executeNode","1:").
+}.
 Run once "executeNode".
 
 Function circularize {

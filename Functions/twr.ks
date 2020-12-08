@@ -1,4 +1,6 @@
-Copypath("0:/Functions/availableEngines","1:").
+If homeConnection:isConnected {
+  Copypath("0:/Functions/availableEngines","1:").
+}.
 Run once "availableEngines".
 
 Function TWR {
