@@ -39,13 +39,16 @@ If homeConnection:isConnected {
 }.
 
 If status = "PRELAUNCH" {
-  Local defaultAltitude is body:atm:height + 5000.
+  Local defaultAltitude is (body:atm:height + 5000) / 1000.
   Local defaultInclination is 0.
-  Local launchGUI is GUI(100,0).
-  Local launchAltitudeLabel is launchGUI:addlabel("Altitude: ").
+  Local defaultTuningValue is 0.14.
+  Local launchGUI is GUI(150,0).
+  Local launchAltitudeLabel is launchGUI:addlabel("Altitude (km): ").
   Local launchAltitudeField is launchGUI:addtextfield(defaultAltitude:tostring).
-  Local launchInclinationLabel is launchGUI:addlabel("Inclination: ").
+  Local launchInclinationLabel is launchGUI:addlabel("Direction (deg): ").
   Local launchInclinationField is launchGUI:addtextfield(defaultInclination:tostring).
+  Local tuningValueLabel is launchGUI:addlabel("Tuning value: ").
+  Local tuningValueField is launchGUI:addtextfield(defaultTuningValue:tostring).
   Local launchButton is launchGUI:addbutton("Launch!").
   Local launchTime is false.
   function checkLaunchTime {
@@ -56,8 +59,9 @@ If status = "PRELAUNCH" {
   Wait until launchTime.
   Local targetAltitude to launchAltitudeField:text:tonumber().
   Local targetDegreesFromNorth to launchInclinationField:text:tonumber() + 90.
+  Local tuningValue to tuningValueField:text:tonumber().
   ClearGUIs().
-  gravityTurn(targetAltitude,targetDegreesFromNorth).
+  gravityTurn(targetAltitude * 1000,targetDegreesFromNorth,tuningValue).
   Circularize().
   Print "Launch complete.".
   Set warp to 0.

@@ -1,23 +1,26 @@
 Function gravityTurn {
-  Parameter targetAltitude, degFromNorth is 90, tuningValue is 0.14.
+  Parameter targetAltitude, degFromNorth is 90.
+  Set startingPressure to body:atm:altitudePressure(altitude).
   Print "Target altitude is " + targetAltitude + "m.".
   Set initialRoll to facing:roll.
   SAS off.
   Lock steering to heading(90,90) + R(0,0,270).
+  //Lock steering to heading(90,90,initialRoll).
   Print "Launch!".
   Stage.
   Wait 1. //clear the launch tower
   Print "Beginning trajectory...".
-  Set startingAltitude to altitude.
-  Lock desiredPitch to MAX(90 - SQRT(tuningValue * (altitude - startingAltitude)), 0).
+  Lock fractionalPressure to body:atm:altitudePressure(altitude) / startingPressure. //should work on any planet
+  Lock desiredPitch to 90 - (1 - fractionalPressure ^ (1/3)) * 90. //the secret sauce
   Lock desiredHeading to heading(degFromNorth,desiredPitch) + R(0,0,270). //should work with any inclination
   Lock steering to desiredHeading.
   Lock pitchDifference to vectorangle(facing:forevector,desiredHeading:forevector).
   Set switchOver to false.
   Until switchOver {
-    Print "Alt: " + round(altitude,0) + "m; Trgt: " + round(desiredPitch,1) + "; Diff: " + round(pitchDifference,1).
+    Print "Alt: " + round(altitude,0) + "m; Prs: " + round(body:atm:altitudePressure(altitude),3) + "atm; Trgt: " + round(desiredPitch,1) + "; Diff: " + round(pitchDifference,1).
     Wait 1.
     If apoapsis > body:atm:height * 0.85 { Set switchOver to true. }.
+    If fractionalPressure < 0.001 { Set switchOver to true. }.
     If altitude > body:atm:height * 0.6 { Set switchOver to true. }.
     If desiredPitch < 5  { Set switchOver to true. }.
   }.
