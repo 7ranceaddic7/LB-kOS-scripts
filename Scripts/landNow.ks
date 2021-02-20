@@ -1,4 +1,4 @@
-Parameter offset.
+Parameter offset is 5.
 
 If homeConnection:isConnected {
   Copypath("0:/Functions/hoverslam","1:").

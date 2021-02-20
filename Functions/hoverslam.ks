@@ -6,7 +6,8 @@ Run once "twr".
 //Adapted from https://github.com/mrbradleyjh/kOS-Hoverslam
 
 Function hoverslam { //deal with lazyglobal scope
-  Parameter someOffset.
+  Parameter someOffset is 5.
+  Print "Offset is " + someOffset + "m.".
   Print "Steering to retrograde.".
   SAS off.
   Lock steering to R(srfretrograde:pitch,srfretrograde:yaw,facing:roll).
@@ -15,7 +16,8 @@ Function hoverslam { //deal with lazyglobal scope
   Print "Usable thrust is " + round(angledThrust(),2) + " of " + round(ship:availablethrust,2) + " possible.".
   Lock maxAcceleration to angledThrust() / ship:mass - localGravity.
   Lock stoppingDistance to ship:velocity:surface:sqrmagnitude / (2 * maxAcceleration).
-  Lock surfaceDistance to srfDistance(someOffset).
+  Set myBounds to ship:bounds.
+  Lock surfaceDistance to min(srfDistance(someOffset),myBounds:bottomaltradar).
   Lock idealThrottle to stoppingDistance / surfaceDistance.
   Wait until surfaceDistance - 500 < stoppingDistance.
   Print "Zeroing warp.".
@@ -24,8 +26,9 @@ Function hoverslam { //deal with lazyglobal scope
   Print "Performing hoverslam!".
   Lock throttle to idealThrottle.
   Gear on.
-  Wait until alt:radar - someOffset < 250.
-  Lock surfaceDistance to alt:radar - someOffset.
+  Wait until surfaceDistance < 250.
+  Set myBounds to ship:bounds.
+  Lock surfaceDistance to min(alt:radar - someOffset,myBounds:bottomaltradar).
   Wait until verticalspeed > -6.
   Print "Touching down.".
   Lock throttle to 0.8/angledTWR().
